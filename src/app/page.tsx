@@ -1,9 +1,6 @@
 "use client"; // This marks this component for client-side rendering
-
-import Image from "next/image";
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSearchParams } from "next/navigation";
 
 interface Product {
   id: number;
@@ -20,8 +17,7 @@ export default function Home() {
   const [data, setData] = useState<Product[] | null>(null);
   // console.log("FFFFFFFFFFFFFFFFFFFFFFFFF", data);
   const [hitApi, setHitApi] = useState<boolean>(false);
-  const searchParams = useSearchParams();
-  const id = searchParams.get("id");
+
   const router = useRouter();
 
   useEffect(() => {
