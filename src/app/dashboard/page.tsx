@@ -23,7 +23,7 @@ const Page = () => {
   }
   const router = useRouter();
   const [data, setData] = useState<Product[] | null>(null);
-  console.log("FETCHED DAATTTTTTTTTTTTTTTTTTTTTTTT", data);
+  // console.log("FETCHED DAATTTTTTTTTTTTTTTTTTTTTTTT", data);
   const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
   const [iscreate, setIsCreate] = useState<boolean>(false);
   const [isUpdate, setIsUpdate] = useState<boolean>(false);
@@ -32,7 +32,7 @@ const Page = () => {
   const [hitApi, setHitApi] = useState<boolean>(false);
   const [productEditObject, setProductEditObject] = useState<any | null>(null);
 
-  console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", productEditObject);
+  //console.log("OOOOOOOOOOOOOOOOOOOOOOOOOOOOOO", productEditObject);
 
   const closeFlyout = () => {
     setIsFlyoutOpen(false);
