@@ -1,9 +1,11 @@
-"use client"; // Ensure this is at the top for client-side rendering
+"use client";  // Ensure that the component is client-side
 
-import { useSearchParams } from "next/navigation";
-import { Suspense, useEffect, useState } from "react"; // Import Suspense and hooks
+import { useState, useEffect } from "react"; // Import hooks
+import axios from "axios"; // Import axios
 import { CgCloseR } from "react-icons/cg";
 import { toast } from "react-toastify";
+import { useSearchParams } from "next/navigation"; // Import useSearchParams
+import { Suspense } from "react"; // Import Suspense
 
 interface Product {
   id: number;
@@ -13,43 +15,32 @@ interface Product {
   image_url: string;
 }
 
-const Page = () => {
+const ProductPage = () => {
+  const searchParams = useSearchParams(); // Get search params
   const [product, setProduct] = useState<Product | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [mobile, setMobile] = useState("");
   const [submitting, setSubmitting] = useState<boolean>(false);
 
-  const searchParams = useSearchParams();
-  const [id, setId] = useState<string | null>(null);
+  const id = searchParams.get("id"); // Access searchParams using `.get("id")`
 
-  // Get product id from the query string
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const productId = searchParams.get("id");
-      setId(productId); // Set the id from query params
-    }
-  }, [searchParams]);
+    if (!id) return;
 
-  // Fetch product details from the API
-  useEffect(() => {
-    if (!id) return; // Ensure 'id' exists before making the API request
     const fetchProduct = async () => {
-      const response = await fetch(
-        `https://gibs-equipment-backend.dynsimulation.com/api/v1/gibsequipment/singleproduct`, // API URL without the query string
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/x-www-form-urlencoded",
-          },
-          body: new URLSearchParams({ id: id.toString() }), // Send 'id' in the body as form data
+      try {
+        const response = await axios.post(
+          "https://gibs-equipment-backend.dynsimulation.com/api/v1/gibsequipment/singleproduct", 
+          new URLSearchParams({ id: id.toString() }) // Send 'id' in the body as form data
+        );
+        
+        if (response.status === 200) {
+          setProduct(response.data.data); // Assuming the response contains the product details in a 'data' object
+        } else {
+          console.error("Failed to fetch product data");
         }
-      );
-
-      if (response.ok) {
-        const data = await response.json();
-        setProduct(data.data); // Assuming the response contains the product details in a 'data' object
-      } else {
-        console.error("Failed to fetch product data");
+      } catch (error) {
+        console.error("Error fetching product:", error);
       }
     };
 
@@ -71,33 +62,36 @@ const Page = () => {
     const formData = new URLSearchParams();
     if (mobile) formData.append("mobileNumber", mobile);
     if (product?.name) formData.append("name", product?.name);
-    if (product?.description)
-      formData.append("description", product?.description);
+    if (product?.description) formData.append("description", product?.description);
     if (product?.image_url) formData.append("image", product?.image_url);
 
     try {
-      const response = await fetch(
+      const response = await axios.post(
         "https://gibs-equipment-backend.dynsimulation.com/api/v1/gibsequipment/sendqoute",
+        formData.toString(),
         {
-          method: "POST",
           headers: {
             "Content-Type": "application/x-www-form-urlencoded",
           },
-          body: formData.toString(),
         }
       );
 
-      toast.success("Quote sent successfully");
-      closeModal();
-      setSubmitting(false);
-      setMobile("");
+      if (response.status === 200) {
+        toast.success("Quote sent successfully");
+        closeModal();
+        setSubmitting(false);
+        setMobile("");
+      } else {
+        toast.error("Failed to send quote");
+      }
     } catch (error) {
-      console.error("Error:", error);
+      console.error("Error sending quote:", error);
+      toast.error("Failed to send quote");
+      setSubmitting(false);
     }
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
       <div>
         <section className="overflow-hidden">
           <div className="container mx-auto">
@@ -168,8 +162,7 @@ const Page = () => {
           </div>
         )}
       </div>
-    </Suspense>
   );
 };
 
-export default Page;
+export default ProductPage;

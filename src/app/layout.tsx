@@ -5,6 +5,7 @@ import Header from "./components/Header";
 import Footer from "./components/Footer";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css"; // Import Toastify CSS
+import { Suspense } from "react";
 
 // Define Montserrat font
 const montserrat = Montserrat({
@@ -24,7 +25,7 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${montserrat.variable} antialiased`}>
         <Header />
-        {children}
+        <Suspense>{children}</Suspense>
         <Footer />
         <ToastContainer /> {/* This will render toast notifications globally */}
       </body>
