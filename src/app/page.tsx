@@ -20,8 +20,8 @@ export default function Home() {
   const [data, setData] = useState<Product[] | null>(null);
   // console.log("FFFFFFFFFFFFFFFFFFFFFFFFF", data);
   const [hitApi, setHitApi] = useState<boolean>(false);
-  const searchParams = useSearchParams(); // Get the search params (query parameters)
-  const id = searchParams.get("id"); // Access the 'id' query parameter
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const router = useRouter();
 
   useEffect(() => {

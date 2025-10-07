@@ -15,8 +15,8 @@ interface Product {
 }
 
 const Page = () => {
-  const searchParams = useSearchParams(); // Get the search params (query parameters)
-  const id = searchParams.get("id"); // Access the 'id' query parameter
+  const searchParams = useSearchParams();
+  const id = searchParams.get("id");
   const [product, setProduct] = useState<Product | null>(null);
 
   const [isModalOpen, setIsModalOpen] = useState(false);
