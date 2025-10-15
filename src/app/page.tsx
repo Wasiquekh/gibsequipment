@@ -1,94 +1,153 @@
-"use client"; // This marks this component for client-side rendering
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+"use client"; // This marks the component for client-side rendering
 
-interface Product {
-  id: number;
-  name: string;
-  description: string;
-  // price: number;
-  image_url: string | null;
-  created_at: string; // ISO string format
-  updated_at: string; // ISO string format
-  user_id: string; // Assuming UUID format
-}
+import React from "react";
+import { Formik, Field, Form, ErrorMessage } from "formik";
+import * as Yup from "yup";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation"; // <-- Correct import for client-side navigation
 
-export default function Home() {
-  const [data, setData] = useState<Product[] | null>(null);
-  // console.log("FFFFFFFFFFFFFFFFFFFFFFFFF", data);
-  const [hitApi, setHitApi] = useState<boolean>(false);
+// 1. Define the Yup validation schema first
+const validationSchema = Yup.object({
+  email: Yup.string()
+    .email("Invalid email address")
+    .required("Email is required"),
+  password: Yup.string()
+    .min(6, "Password must be at least 6 characters")
+    .required("Password is required"),
+});
 
-  const router = useRouter();
+// 2. Infer the TypeScript type from the validation schema
+type LoginFormValues = Yup.InferType<typeof validationSchema>;
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await fetch(
-          "https://gibs-equipment-backend.dynsimulation.com/api/v1/gibsequipment/allproducts",
-          {
-            method: "GET",
-            headers: {
-              "Content-Type": "application/x-www-form-urlencoded",
-            },
-          }
-        );
+const Page = () => {
+  const router = useRouter(); // Use the correct router hook
 
-        // Check if the response is OK
-        if (!response.ok) {
-          throw new Error("Network response was not ok");
+  // 3. Use the inferred type for initialValues and handleSubmit
+  const initialValues: LoginFormValues = { email: "", password: "" };
+
+  // Handle form submission
+  const handleSubmit = async (values: LoginFormValues) => {
+    console.log(values); // log the values to the console
+
+    // Prepare the request payload
+    const payload = new URLSearchParams({
+      email: values.email,
+      password: values.password,
+    });
+
+    try {
+      const response = await fetch(
+        "https://gibs-equipment-backend.dynsimulation.com/api/v1/gibsequipment/login",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/x-www-form-urlencoded",
+          },
+          body: payload,
         }
+      );
+      const data = await response.json();
 
-        // Parse the JSON body from the response
-        const data = await response.json();
-        setData(data.data);
-        // Log the parsed response body (actual data)
-        console.log("Fetched data:", data);
-      } catch (error) {
-        console.error("An error occurred during the fetch:", error);
+      console.log("Response Data:", data);
+
+      // Check for successful login response
+      if (data?.data?.user) {
+        const userEmail = data.data.user.email;
+        const userId = data.data.user.id;
+
+        // Save user details in localStorage
+        localStorage.setItem("userEmail", userEmail);
+        localStorage.setItem("userId", userId);
+
+        toast.success("Login Success");
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);  // Redirect with a small delay
+        console.log("Redirecting to dashboard...", data);
+      } else {
+        // If no user data exists, show an error
+        toast.error("Invalid username or password.");
       }
-    };
-
-    fetchData();
-  }, [hitApi]); // Empty dependency array ensures this runs once when the component mounts
-  const productId = (id: number) => {
-    router.push(`/product-details?id=${id}`);
+    } catch (error) {
+      console.error("An error occurred during login:", error);
+      toast.error("Login Failed. Please try again.");
+    }
   };
+
   return (
-    <>
-      <div className="container mx-auto p-4">
-        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-          {/* Map through the data and render each product */}
-          {data?.map((product) => (
-            <div
-              onClick={() => productId(product.id)}
-              key={product.id}
-              className="bg-white shadow-lg rounded-lg overflow-hidden cursor-pointer"
-            >
-              <img
-                src={product.image_url || "/images/noimage.jpg"} // Use default if image_url is null
-                alt={product.name}
-                className="w-full h-48 object-cover"
-              />
-              <div className="p-4">
-                <h2 className="font-semibold text-xl capitalize">
-                  {product.name}
-                </h2>
-                <p className="text-gray-600 text-sm">{product.description}</p>
-                {/* Flex container for price and button */}
-                <div className="flex justify-between items-center mt-2">
-                  {/* <p className="font-bold text-lg">${product.price}</p> */}
-                  <button
-                    onClick={() => productId(product.id)}
-                    className="bg-blue-500 text-white py-2 px-6 rounded-lg hover:bg-blue-600 cursor-pointer"
-                  >
-                    Details
-                  </button>
-                </div>
-              </div>
-            </div>
-          ))}
+    <div>
+      {/* NOTE: The <header> component here should ideally be moved 
+        to your global app/layout.tsx file if you want it on every page.
+      */}
+      <header>
+        <div className="p-4 text-white text-center" style={{ backgroundColor: "#e60000" }}>
+          <h1 className="text-xl">Welcome Ranjeet Kumar</h1>
         </div>
+      </header>
+
+      {/* Login Form */}
+      <div className="max-w-md mx-auto mt-10">
+        <Formik
+          initialValues={initialValues}
+          validationSchema={validationSchema}
+          onSubmit={handleSubmit}
+        >
+          {({ isSubmitting }) => (
+            <Form className="bg-white p-8 rounded shadow-md border" style={{ borderColor: "#e60000" }}>
+              <div className="mb-4">
+                <label htmlFor="email" className="block" style={{ color: "#e60000" }}>
+                  Email
+                </label>
+                <Field
+                  type="email"
+                  id="email"
+                  name="email"
+                  placeholder="Enter your email"
+                  className="w-full p-2 border rounded mt-1"
+                  style={{ borderColor: "#e60000" }}
+                />
+                <ErrorMessage
+                  name="email"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
+              <div className="mb-4">
+                <label htmlFor="password" className="block" style={{ color: "#e60000" }}>
+                  Password
+                </label>
+                <Field
+                  type="password"
+                  id="password"
+                  name="password"
+                  placeholder="Enter your password"
+                  className="w-full p-2 border rounded mt-1"
+                  style={{ borderColor: "#e60000" }}
+                />
+                <ErrorMessage
+                  name="password"
+                  component="div"
+                  className="text-red-500 text-sm"
+                />
+              </div>
+
+              <div className="mb-4">
+                <button
+                  type="submit"
+                  className="w-full text-white p-2 rounded disabled:opacity-50 hover:bg-opacity-90 transition duration-150"
+                  disabled={isSubmitting}
+                  style={{ backgroundColor: "#e60000" }}
+                >
+                  {isSubmitting ? "Logging In..." : "Login"}
+                </button>
+              </div>
+            </Form>
+          )}
+        </Formik>
       </div>
-    </>
+    </div>
   );
-}
+};
+
+export default Page;

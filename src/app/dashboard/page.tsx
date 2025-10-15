@@ -299,9 +299,9 @@ const Page = () => {
          {/* Add Button */}
          <div className="mb-4">
            <button
+             style={{ backgroundColor: '#e60000' }}
              onClick={openAddProduct}
-             className="bg-green-500 text-white px-6 py-2 rounded-lg shadow hover:bg-green-600 transition duration-200"
-           >
+             className="bg-red-500 text-white px-6 py-2 rounded-lg shadow hover:bg-red-600 transition duration-200">
              Add Product
            </button>
          </div>
@@ -342,14 +342,16 @@ const Page = () => {
                    </td>
                    <td className="px-6 py-4 space-x-2">
                      <button
+                       style={{ backgroundColor: '#003366' }}
                        onClick={() => openEditProduct(product)}
-                       className="bg-blue-500 text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
-                     >
+                       className="text-white px-4 py-2 rounded-md hover:bg-blue-600 transition duration-200"
+                      >
                        Update
                      </button>
                      <button
+                        style={{ backgroundColor: '#e60000' }}
                        onClick={() => handleDelete(product.id)}
-                       className="bg-red-500 text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
+                       className="text-white px-4 py-2 rounded-md hover:bg-red-600 transition duration-200"
                      >
                        Delete
                      </button>
@@ -789,9 +791,10 @@ const Page = () => {
                      {/* Submit Button */}
                      <div className="flex flex-col w-full mt-4">
                        <button
+                         style={{ backgroundColor: '#003366' }}
                          type="submit"
                          disabled={isSubmitting}
-                         className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                         className="text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
                        >
                          {isSubmitting ? "Submitting..." : "Update Product"}
                        </button>

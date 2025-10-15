@@ -48,6 +48,8 @@ const Page = () => {
       );
       const data = await response.json();
 
+      console.log("Response Data:", data);
+
       // Check for successful login response
       if (data?.data?.user) {
         const userEmail = data.data.user.email;
@@ -58,7 +60,10 @@ const Page = () => {
         localStorage.setItem("userId", userId);
 
         toast.success("Login Success");
-        router.push("/dashboard"); // Redirect to dashboard
+        setTimeout(() => {
+          router.push("/dashboard");
+        }, 100);  // Redirect with a small delay
+        console.log("Redirecting to dashboard...", data);
       } else {
         // If no user data exists, show an error
         toast.error("Invalid username or password.");
@@ -68,14 +73,15 @@ const Page = () => {
       toast.error("Login Failed. Please try again.");
     }
   };
+
   return (
     <div>
       {/* NOTE: The <header> component here should ideally be moved 
         to your global app/layout.tsx file if you want it on every page.
       */}
       <header>
-        <div className="bg-indigo-500 p-4 text-white text-center">
-          <h1 className="text-xl">Welcome to Our Site</h1>
+        <div className="p-4 text-white text-center" style={{ backgroundColor: "#e60000" }}>
+          <h1 className="text-xl">Welcome Ranjeet Kumar</h1>
         </div>
       </header>
 
@@ -87,9 +93,9 @@ const Page = () => {
           onSubmit={handleSubmit}
         >
           {({ isSubmitting }) => (
-            <Form className="bg-white p-8 rounded shadow-md">
+            <Form className="bg-white p-8 rounded shadow-md border" style={{ borderColor: "#e60000" }}>
               <div className="mb-4">
-                <label htmlFor="email" className="block text-gray-700">
+                <label htmlFor="email" className="block" style={{ color: "#e60000" }}>
                   Email
                 </label>
                 <Field
@@ -97,7 +103,8 @@ const Page = () => {
                   id="email"
                   name="email"
                   placeholder="Enter your email"
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                  className="w-full p-2 border rounded mt-1"
+                  style={{ borderColor: "#e60000" }}
                 />
                 <ErrorMessage
                   name="email"
@@ -107,7 +114,7 @@ const Page = () => {
               </div>
 
               <div className="mb-4">
-                <label htmlFor="password" className="block text-gray-700">
+                <label htmlFor="password" className="block" style={{ color: "#e60000" }}>
                   Password
                 </label>
                 <Field
@@ -115,7 +122,8 @@ const Page = () => {
                   id="password"
                   name="password"
                   placeholder="Enter your password"
-                  className="w-full p-2 border border-gray-300 rounded mt-1"
+                  className="w-full p-2 border rounded mt-1"
+                  style={{ borderColor: "#e60000" }}
                 />
                 <ErrorMessage
                   name="password"
@@ -127,8 +135,9 @@ const Page = () => {
               <div className="mb-4">
                 <button
                   type="submit"
-                  className="w-full bg-blue-500 text-white p-2 rounded disabled:opacity-50 hover:bg-blue-600 transition duration-150"
+                  className="w-full text-white p-2 rounded disabled:opacity-50 hover:bg-opacity-90 transition duration-150"
                   disabled={isSubmitting}
+                  style={{ backgroundColor: "#e60000" }}
                 >
                   {isSubmitting ? "Logging In..." : "Login"}
                 </button>
