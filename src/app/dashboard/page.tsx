@@ -27,7 +27,13 @@ const Page = () => {
    const [isFlyoutOpen, setIsFlyoutOpen] = useState(false);
    const [iscreate, setIsCreate] = useState<boolean>(false);
    const [isUpdate, setIsUpdate] = useState<boolean>(false);
-   const [userEmail, setUserEmail] = useState<string | null>(null);
+ const [userEmail, setUserEmail] = useState<string | null>(() => {
+  if (typeof window !== "undefined") {
+    return localStorage.getItem("userEmail");
+  }
+  return null;
+});
+
    const [userId, setUserId] = useState<string | null>(null);
    const [hitApi, setHitApi] = useState<boolean>(false);
    const [productEditObject, setProductEditObject] = useState<any | null>(null);
@@ -42,7 +48,7 @@ const Page = () => {
    useEffect(() => {
      const email = localStorage.getItem("userEmail");
      const id = localStorage.getItem("userId");
-     setUserEmail(email);
+    // setUserEmail(email);
      setUserId(id);
    }, []);
    // console.log(
@@ -52,14 +58,15 @@ const Page = () => {
    // );
    useEffect(() => {
      // Retrieve the user email and ID from localStorage
-     const email = localStorage.getItem("userEmail");
+     //const email = localStorage.getItem("userEmail");
      const id = localStorage.getItem("userId");
-     setUserEmail(email);
+     //setUserEmail(email);
      setUserId(id);
 
-     // If the email is not "wasiquekhan90@gmail.com", redirect to login
-     if (email && email !== "wasiquekhan90@gmail.com") {
-       router.push("/login");
+     // If userEmail is null, or not the admin email, redirect to login.
+     if (!userEmail || userEmail !== "wasiquekhan90@gmail.com") {
+       router.push("/");
+       return; // Stop execution of the effect
      }
 
      // Set a timeout to clear localStorage after 12 hours (12 hours = 43200000 ms)
@@ -70,7 +77,7 @@ const Page = () => {
 
      // Clean up the timeout when the component is unmounted
      return () => clearTimeout(timeout);
-   }, [router]);
+   }, [userEmail, router]);
 
    useEffect(() => {
      const fetchData = async () => {
@@ -293,16 +300,30 @@ const Page = () => {
      }
    };
 
+   const handleLogout = () => {
+     if (typeof window !== "undefined") {
+       localStorage.clear(); // Clear all items from localStorage
+       toast.info("You have been logged out.");
+     }
+     router.push("/"); // Redirect to the home page
+   };
+
    return (
      <>
        <div className="overflow-x-auto p-6 container">
          {/* Add Button */}
-         <div className="mb-4">
+         <div className="mb-4 flex justify-between">
            <button
              style={{ backgroundColor: '#e60000' }}
              onClick={openAddProduct}
              className="bg-red-500 text-white px-6 py-2 rounded-lg shadow hover:bg-red-600 transition duration-200">
              Add Product
+           </button>
+           <button
+             style={{ backgroundColor: '#e60000' }}
+             onClick={handleLogout}
+             className="bg-red-500 text-white px-6 py-2 rounded-lg shadow hover:bg-red-600 transition duration-200">
+             Logout
            </button>
          </div>
 
@@ -378,10 +399,10 @@ const Page = () => {
        )}
        {/* Flyout */}
        <div
-         className={`fixed top-0 right-0 w-[560px] h-full bg-white transform transition-transform duration-300 z-50 ${
+         className={`fixed top-0 right-0 w-full sm:w-[560px] h-full bg-white transform transition-transform duration-300 z-50 ${
            isFlyoutOpen ? "translate-x-0" : "translate-x-full"
          }`}
-       >
+         >
          <div className="p-4">
            <div onClick={() => closeFlyout()} className=" flex justify-end">
              <CgCloseR className=" text-3xl" />
@@ -573,7 +594,8 @@ const Page = () => {
                        <button
                          type="submit"
                          disabled={isSubmitting}
-                         className="bg-blue-500 text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                         className="text-white px-6 py-3 rounded-lg shadow-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 w-full"
+                         style={{backgroundColor: '#003366'}}
                        >
                          {isSubmitting ? "Submitting..." : "Add Product"}
                        </button>

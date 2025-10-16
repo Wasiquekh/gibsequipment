@@ -28,7 +28,7 @@ body {
 .container {
   max-width: 1280px;
   margin: 0 auto; /* top-bottom 75px, left-right 20px */
-  padding: 75px 20px; /* Optional: Adjust padding if needed */
+  padding: 25px 20px; /* Optional: Adjust padding if needed */
   box-sizing: border-box; /* Ensures padding and border don't affect the width */
   width: 100%; /* Make sure the container uses the full width available */
 }
